@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <ItemGroup>
+        <ProjectReference Include="..\base-interfaces\base-interfaces.csproj" />
+    </ItemGroup>
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <RootNamespace>Lem.Networking</RootNamespace>
+        <LangVersion>7.3</LangVersion>
+    </PropertyGroup>
+
+</Project>
