@@ -11,10 +11,14 @@ bin/
 .idea/**/dictionaries
 .idea/**/shelf
 
+*.DotSettings.user
+
 # Generated files
 .idea/**/contentModel.xml
 .idea/**/riderModule.iml
 .idea/**/modules.xml
+.idea/**/encodings.xml
+.idea/**/misc.xml
 
 # Sensitive or high-churn files
 .idea/**/dataSources/

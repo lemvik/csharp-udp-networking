@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <ItemGroup>
-        <ProjectReference Include="..\base-interfaces\base-interfaces.csproj" />
+        <ProjectReference Include="..\channel-interfaces\channel-interfaces.csproj" />
     </ItemGroup>
 
     <PropertyGroup>

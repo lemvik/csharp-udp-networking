@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <ItemGroup>
-        <ProjectReference Include="..\base-implementation\base-implementation.csproj" />
+        <ProjectReference Include="..\channel-implementation\channel-implementation.csproj" />
     </ItemGroup>
 
     <ItemGroup>
