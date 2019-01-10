@@ -20,7 +20,7 @@ namespace Lem.Networking.Channels
         /// <returns>internal identifier of the message</returns>
         /// <remarks>Note that the acknowledgement itself could be lost, so lack of ack over particular time frame doesn't mean that message has been definitely lost.</remarks>
         /// <remarks>The returned ID can be reused after a while, so tracking currently-flying IDs might be required.</remarks>
-        int Send(in ReadOnlySpan<byte> packetBuffer);
+        ReadOnlySpan<byte> Send(in ReadOnlySpan<byte> packetBuffer, out int packetId);
 
         /// <summary>
         /// Fires when packet with particular ID has been acknowledged.

@@ -16,6 +16,8 @@ namespace Lem.Networking.Channels
         /// </summary>
         /// <param name="packetBuffer">packet to send to the remote</param>
         /// <remarks>if packet exceeds <see cref="Constants.MaximumPacketSize"/> bytes exceeding bytes won't be sent.</remarks>
-        void Send(in ReadOnlySpan<byte> packetBuffer);
+        /// <returns>buffer that can be sent over the wire. If it's empty then channel is unable to prepare the
+        /// send operation.</returns>
+        ReadOnlySpan<byte> Send(in ReadOnlySpan<byte> packetBuffer);
     }
 }
