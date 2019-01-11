@@ -1,27 +1,76 @@
 using System;
+using Lem.Networking.Implementation.Packets;
 
-namespace Lem.Networking.Channels
+namespace Lem.Networking.Implementation.Channels
 {
-    public class UnreliableChannel : IUnreliableChannel
+    internal class UnreliableChannel : IUnreliableChannel
     {
+        private readonly ChannelAddress channelAddress;
+
+        internal UnreliableChannel(ChannelAddress channelAddress)
+        {
+            this.channelAddress = channelAddress;
+        }
+
         public void Dispose()
         {
-            throw new NotImplementedException();
         }
 
-        public bool Receive(in Span<byte> packetBuffer, out int receivedBytes)
+        public int BufferRequiredByteSize(int desiredPacketByteSize)
         {
-            throw new NotImplementedException();
+            return desiredPacketByteSize + UnreliableHeader.ByteSize;
         }
 
-        public void Update()
+        public void PrepareSend(in Span<byte> paddedSendPacket)
         {
-            throw new NotImplementedException();
+            if (paddedSendPacket.Length * 8 > Constants.PayloadLengthFieldSize)
+            {
+                return;
+            }
+
+            UnreliableHeader.WriteChannelAddress(paddedSendPacket, channelAddress);
+            var payloadLength = (short) (paddedSendPacket.Length - UnreliableHeader.ByteSize);
+            UnreliableHeader.WritePayloadLength(paddedSendPacket, payloadLength);
         }
 
-        public void Send(in ReadOnlySpan<byte> packetBuffer)
+        public ReadOnlySpan<byte> Receive(in ReadOnlySpan<byte> incomingPacketBuffer)
         {
-            throw new NotImplementedException();
+            var address = UnreliableHeader.ReadChannelAddress(incomingPacketBuffer);
+            if (address != channelAddress)
+            {
+                return ReadOnlySpan<byte>.Empty;
+            }
+
+            var packetLen = UnreliableHeader.ReadPayloadLength(incomingPacketBuffer);
+            if (packetLen > Constants.PayloadLengthFieldSize)
+            {
+                return ReadOnlySpan<byte>.Empty;
+            }
+
+            return incomingPacketBuffer.Slice(UnreliableHeader.ByteSize, packetLen);
+        }
+
+        internal static class UnreliableHeader
+        {
+            internal const int ByteSize = ChannelAddress.ByteSize + Constants.PayloadLengthFieldSize;
+
+            internal static void WriteChannelAddress(in Span<byte> messageBuffer, in ChannelAddress address)
+            {
+            }
+
+            internal static void WritePayloadLength(in Span<byte> messageBuffer, short payloadLengthInBits)
+            {
+            }
+
+            internal static ChannelAddress ReadChannelAddress(in ReadOnlySpan<byte> packetBuffer)
+            {
+                return default;
+            }
+
+            internal static short ReadPayloadLength(in ReadOnlySpan<byte> packetBuffer)
+            {
+                return default;
+            }
         }
     }
 }

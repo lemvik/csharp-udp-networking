@@ -1,5 +1,6 @@
 using System;
 using JetBrains.Annotations;
+using Lem.Networking.Channels.Sync;
 
 namespace Lem.Networking.Channels
 {

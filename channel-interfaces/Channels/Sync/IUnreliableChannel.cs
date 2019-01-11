@@ -1,7 +1,7 @@
 using System;
 using JetBrains.Annotations;
 
-namespace Lem.Networking.Channels
+namespace Lem.Networking.Channels.Sync
 {
     /// <inheritdoc />
     /// <summary>
@@ -15,9 +15,15 @@ namespace Lem.Networking.Channels
         /// Attempts to send packet to the remote. 
         /// </summary>
         /// <param name="packetBuffer">packet to send to the remote</param>
-        /// <remarks>if packet exceeds <see cref="Constants.MaximumPacketSize"/> bytes exceeding bytes won't be sent.</remarks>
+        /// <remarks>if packet exceeds <see cref="Constants.MaximumPayloadSizeBytes"/> bytes exceeding bytes won't be sent.</remarks>
         /// <returns>buffer that can be sent over the wire. If it's empty then channel is unable to prepare the
         /// send operation.</returns>
         ReadOnlySpan<byte> Send(in ReadOnlySpan<byte> packetBuffer);
+    }
+
+    public ref struct UnreliableSendResult
+    {
+        public ReadOnlySpan<byte> SendBuffer;
+        public bool               Successful;
     }
 }
