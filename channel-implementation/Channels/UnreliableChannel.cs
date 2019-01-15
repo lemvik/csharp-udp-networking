@@ -16,6 +16,8 @@ namespace Lem.Networking.Implementation.Channels
         {
         }
 
+        public int MaxPayloadSize => Constants.MaximumPayloadSizeBytes - UnreliableHeader.ByteSize;
+
         public int BufferRequiredByteSize(int desiredPacketByteSize)
         {
             return desiredPacketByteSize + UnreliableHeader.ByteSize;

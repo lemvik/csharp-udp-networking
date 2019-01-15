@@ -1,4 +1,5 @@
 using System;
+using Lem.Networking.Exceptions;
 using Lem.Networking.Implementation.Packets;
 using Lem.Networking.Utilities.Memory;
 using Lem.Networking.Utilities.Resources;
@@ -22,8 +23,16 @@ namespace Lem.Networking.Implementation.Channels
         {
         }
 
+        public int MaxPayloadSize => Constants.MaximumPayloadSizeBytes - AckChannelHeader.ByteSize;
+
         public int BufferRequiredByteSize(int desiredPacketByteSize)
         {
+            if (desiredPacketByteSize > MaxPayloadSize)
+            {
+                throw new
+                    NetworkConstraintViolationException($"Specified packet size + header exceeds maximum allowed packet size of {MaxPayloadSize}");
+            }
+
             return AckChannelHeader.ByteSize + desiredPacketByteSize;
         }
 
@@ -34,13 +43,12 @@ namespace Lem.Networking.Implementation.Channels
             var sendEntry = sentPackets.Allocate(lastSentSequence);
             sendEntry.Acked = false;
 
-            var _ = new AckChannelHeader(paddedPacketBuffer)
-            {
+            var _ = new AckChannelHeader(paddedPacketBuffer) {
                 Address       = channelAddress,
                 Sequence      = lastSentSequence,
                 RecvSequence  = lastReceivedSequence,
                 AckMask       = acksMask,
-                PayloadLength = (short) (paddedPacketBuffer.Length - AckChannelHeader.ByteSize)
+                PayloadLength = (ushort) (paddedPacketBuffer.Length - AckChannelHeader.ByteSize)
             };
 
             return lastSentSequence;
@@ -94,9 +102,18 @@ namespace Lem.Networking.Implementation.Channels
                 Address           = default;
             }
 
-            internal ChannelAddress Address { get; set; }
+            internal ChannelAddress Address
+            {
+                get => new ChannelAddress(packetBuffer.Int(0), packetBuffer.Byte(sizeof(int)));
 
-            internal ref short  PayloadLength => ref packetBuffer.ShortRef(PayloadLengthOffset);
+                set
+                {
+                    packetBuffer.IntRef(0)            = value.ConnectionId;
+                    packetBuffer.ByteRef(sizeof(int)) = value.ChannelId;
+                }
+            }
+
+            internal ref ushort PayloadLength => ref packetBuffer.UShortRef(PayloadLengthOffset);
             internal ref ushort Sequence      => ref packetBuffer.UShortRef(SequenceOffset);
             internal ref ushort RecvSequence  => ref packetBuffer.UShortRef(RecvSequenceOffset);
             internal ref int    AckMask       => ref packetBuffer.IntRef(AckMaskOffset);
@@ -134,7 +151,6 @@ namespace Lem.Networking.Implementation.Channels
         {
             public void Reset()
             {
-                throw new NotImplementedException();
             }
         }
     }

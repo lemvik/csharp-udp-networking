@@ -62,7 +62,7 @@ namespace Lem.Networking.Implementation.Channels
 
         public (ushort, int) GenerateAck()
         {
-            int acksMask     = 0;
+            var acksMask     = 0;
             for (ushort index = 0; index < sizeof(int) * 8; ++index)
             {
                 if (Element((ushort) (lastSequence - index)) != null)

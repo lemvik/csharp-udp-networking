@@ -9,6 +9,12 @@ namespace Lem.Networking.Implementation.Packets
 
         public const int ByteSize = sizeof(int) + sizeof(byte);
 
+        public ChannelAddress(int connectionId, byte channelId)
+        {
+            ConnectionId = connectionId;
+            ChannelId    = channelId;
+        }
+
         public bool Equals(ChannelAddress other)
         {
             return ConnectionId == other.ConnectionId && ChannelId == other.ChannelId;

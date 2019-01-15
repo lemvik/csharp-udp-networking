@@ -8,6 +8,7 @@
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
         <RootNamespace>Lem.Networking.Implementation</RootNamespace>
+        <AssemblyName>Lem.Networking</AssemblyName>
         <LangVersion>7.3</LangVersion>
     </PropertyGroup>
 
