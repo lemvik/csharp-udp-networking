@@ -34,7 +34,7 @@ namespace Lem.Networking.Tests.Channels
 
             ackChannel.BufferRequiredByteSize(normalPacketSize)
                       .Should()
-                      .Be(normalPacketSize + AckChannel.AckChannelHeader.ByteSize,
+                      .Be(normalPacketSize + AckPacketHeader.ByteSize,
                           "Packet should contain space for header and contents");
 
             var excessivePacketSize = ackChannel.MaxPayloadSize + 1;
@@ -47,7 +47,7 @@ namespace Lem.Networking.Tests.Channels
 
             ackChannel.BufferRequiredByteSize(emptyPacketSize)
                       .Should()
-                      .Be(AckChannel.AckChannelHeader.ByteSize,
+                      .Be(AckPacketHeader.ByteSize,
                           "Empty packet should consist of header only.");
         }
 
@@ -56,7 +56,7 @@ namespace Lem.Networking.Tests.Channels
         {
             var payload      = new byte[] {1, 2, 3, 4};
             var packetBuffer = new byte[ackChannel.BufferRequiredByteSize(payload.Length)];
-            Buffer.BlockCopy(payload, 0, packetBuffer, AckChannel.AckChannelHeader.ByteSize, payload.Length);
+            Buffer.BlockCopy(payload, 0, packetBuffer, AckPacketHeader.ByteSize, payload.Length);
             var packetSpan = new Span<byte>(packetBuffer);
 
             var preparedPacket = ackChannel.PrepareSend(packetSpan);

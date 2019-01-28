@@ -1,18 +1,18 @@
 using System;
+using System.Runtime.InteropServices;
 
 namespace Lem.Networking.Implementation.Packets
 {
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     internal struct ChannelAddress : IEquatable<ChannelAddress>
     {
-        public int  ConnectionId { get; }
-        public byte ChannelId    { get; }
+        public ushort ConnectionId { get; }
+        public byte   ChannelId    { get; }
 
-        public const int ByteSize = sizeof(int) + sizeof(byte);
-
-        public ChannelAddress(int connectionId, byte channelId)
+        public ChannelAddress(ushort connectionId, byte channelId)
         {
-            ConnectionId = connectionId;
-            ChannelId    = channelId;
+            this.ConnectionId = connectionId;
+            this.ChannelId    = channelId;
         }
 
         public bool Equals(ChannelAddress other)

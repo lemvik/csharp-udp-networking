@@ -6,6 +6,6 @@ namespace Lem.Networking.Implementation.Channels
     {
         void PrepareSend(in Span<byte> paddedSendPacket);
 
-        ReadOnlySpan<byte> Receive(in ReadOnlySpan<byte> incomingPacketBuffer);
+        ReadOnlySpan<byte> Receive(in ReadOnlySpan<byte> incomingPacketBuffer, out ushort sequence);
     }
 }

@@ -1,7 +1,6 @@
 using System;
 using Lem.Networking.Exceptions;
 using Lem.Networking.Implementation.Packets;
-using Lem.Networking.Utilities.Memory;
 using Lem.Networking.Utilities.Resources;
 
 namespace Lem.Networking.Implementation.Channels
@@ -23,7 +22,7 @@ namespace Lem.Networking.Implementation.Channels
         {
         }
 
-        public int MaxPayloadSize => Constants.MaximumPayloadSizeBytes - AckChannelHeader.ByteSize;
+        public int MaxPayloadSize => Constants.MaximumPayloadSizeBytes - AckPacketHeader.ByteSize;
 
         public int BufferRequiredByteSize(int desiredPacketByteSize)
         {
@@ -33,7 +32,7 @@ namespace Lem.Networking.Implementation.Channels
                     NetworkConstraintViolationException($"Specified packet size + header exceeds maximum allowed packet size of {MaxPayloadSize}");
             }
 
-            return AckChannelHeader.ByteSize + desiredPacketByteSize;
+            return AckPacketHeader.ByteSize + desiredPacketByteSize;
         }
 
         public int PrepareSend(in Span<byte> paddedPacketBuffer)
@@ -43,24 +42,26 @@ namespace Lem.Networking.Implementation.Channels
             var sendEntry = sentPackets.Allocate(lastSentSequence);
             sendEntry.Acked = false;
 
-            var _ = new AckChannelHeader(paddedPacketBuffer) {
-                Address       = channelAddress,
-                Sequence      = lastSentSequence,
-                RecvSequence  = lastReceivedSequence,
-                AckMask       = acksMask,
-                PayloadLength = (ushort) (paddedPacketBuffer.Length - AckChannelHeader.ByteSize)
+            var header = new AckPacketHeader {
+                ChannelAddress   = channelAddress,
+                Sequence         = lastSentSequence,
+                PayloadLength    = (ushort) (paddedPacketBuffer.Length - BasePacketHeader.ByteSize),
+                ReceivedSequence = lastReceivedSequence,
+                AcksMask         = (uint) acksMask
             };
+
+            paddedPacketBuffer.Write(header);
 
             return lastSentSequence;
         }
 
         public ReadOnlySpan<byte> Receive(in ReadOnlySpan<byte> incomingPacketBuffer)
         {
-            var header           = new IncomingAckChannelHeader(incomingPacketBuffer);
+            incomingPacketBuffer.Read(out AckPacketHeader header);
             var incomingSequence = header.Sequence;
             var _                = receivedPackets.Allocate(incomingSequence);
-            var lastRecv         = header.RecvSequence;
-            var ackMask          = header.AckMask;
+            var lastRecv         = header.ReceivedSequence;
+            var ackMask          = header.AcksMask;
 
             for (ushort index = 0; index < sizeof(int) * 8; ++index)
             {
@@ -78,64 +79,10 @@ namespace Lem.Networking.Implementation.Channels
                 ackMask >>= 1;
             }
 
-            return incomingPacketBuffer.Slice(AckChannelHeader.PayloadOffset);
+            return incomingPacketBuffer.Slice(AckPacketHeader.ByteSize);
         }
 
         public event Action<int> PacketAcknowledged;
-
-        internal ref struct AckChannelHeader
-        {
-            internal const int AddressOffset       = 0;
-            internal const int PayloadLengthOffset = AddressOffset + ChannelAddress.ByteSize;
-            internal const int SequenceOffset      = PayloadLengthOffset + Constants.PayloadLengthFieldSize;
-            internal const int RecvSequenceOffset  = SequenceOffset + sizeof(ushort);
-            internal const int AckMaskOffset       = RecvSequenceOffset + sizeof(ushort);
-            internal const int PayloadOffset       = AckMaskOffset + sizeof(int);
-
-            internal const int ByteSize = PayloadOffset;
-
-            private Span<byte> packetBuffer;
-
-            public AckChannelHeader(Span<byte> packetBuffer)
-            {
-                this.packetBuffer = packetBuffer;
-                Address           = default;
-            }
-
-            internal ChannelAddress Address
-            {
-                get => new ChannelAddress(packetBuffer.Int(0), packetBuffer.Byte(sizeof(int)));
-
-                set
-                {
-                    packetBuffer.IntRef(0)            = value.ConnectionId;
-                    packetBuffer.ByteRef(sizeof(int)) = value.ChannelId;
-                }
-            }
-
-            internal ref ushort PayloadLength => ref packetBuffer.UShortRef(PayloadLengthOffset);
-            internal ref ushort Sequence      => ref packetBuffer.UShortRef(SequenceOffset);
-            internal ref ushort RecvSequence  => ref packetBuffer.UShortRef(RecvSequenceOffset);
-            internal ref int    AckMask       => ref packetBuffer.IntRef(AckMaskOffset);
-        }
-
-        internal ref struct IncomingAckChannelHeader
-        {
-            private ReadOnlySpan<byte> packetBuffer;
-
-            public IncomingAckChannelHeader(ReadOnlySpan<byte> packetBuffer)
-            {
-                this.packetBuffer = packetBuffer;
-                Address           = default;
-            }
-
-            internal ChannelAddress Address { get; }
-
-            internal short  PayloadLength => packetBuffer.Short(AckChannelHeader.PayloadLengthOffset);
-            internal ushort Sequence      => packetBuffer.UShort(AckChannelHeader.SequenceOffset);
-            internal ushort RecvSequence  => packetBuffer.UShort(AckChannelHeader.RecvSequenceOffset);
-            internal int    AckMask       => packetBuffer.Int(AckChannelHeader.AckMaskOffset);
-        }
 
         internal class SentPacket : IResettable
         {
