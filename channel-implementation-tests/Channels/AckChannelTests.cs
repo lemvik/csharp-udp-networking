@@ -63,13 +63,15 @@ namespace Lem.Networking.Tests.Channels
 
             preparedPacket.Should().BeGreaterOrEqualTo(0);
 
-            packetSpan.Int(0).Should().Be(connectionId);
-            packetSpan.Byte(sizeof(int)).Should().Be(channelId);
-            packetSpan.UShort(sizeof(int) + sizeof(byte)).Should().Be((ushort) payload.Length); // Payload length
-            packetSpan.UShort(sizeof(int) + sizeof(byte) + sizeof(ushort))
-                      .Should().Be((ushort) preparedPacket); // Sequence number
-            packetSpan.UShort(sizeof(int) + sizeof(byte) + sizeof(ushort) * 2).Should().Be(0); // Recv sequence number
-            packetSpan.Int(sizeof(int) + sizeof(byte) + sizeof(ushort) * 3).Should().Be(0); // Received packets mask
+            packetSpan.Read(out AckPacketHeader header).Should().BeTrue();
+
+            header.ConnectionId.Should().Be(connectionId);
+            header.ChannelId.Should().Be(channelId);
+            header.Sequence.Should().Be((ushort)preparedPacket);
+            header.Checksum.Should().Be(0);
+            header.PayloadLength.Should().Be((ushort) payload.Length);
+            header.ReceivedSequence.Should().Be(0);
+            header.AcksMask.Should().Be(0);
         }
     }
 }

@@ -45,7 +45,7 @@ namespace Lem.Networking.Implementation.Channels
             var header = new AckPacketHeader {
                 ChannelAddress   = channelAddress,
                 Sequence         = lastSentSequence,
-                PayloadLength    = (ushort) (paddedPacketBuffer.Length - BasePacketHeader.ByteSize),
+                PayloadLength    = (ushort) (paddedPacketBuffer.Length - AckPacketHeader.ByteSize),
                 ReceivedSequence = lastReceivedSequence,
                 AcksMask         = (uint) acksMask
             };

@@ -9,6 +9,7 @@ namespace Lem.Networking.Implementation.Channels
         private readonly ushort[]   sequence;
         private readonly TElement[] elements;
         private          ushort     lastSequence;
+        private          bool       hasAllocations;
 
         public SequenceBuffer(int size)
         {
@@ -21,7 +22,7 @@ namespace Lem.Networking.Implementation.Channels
         public TElement Element(ushort sequenceNumber)
         {
             var index = sequenceNumber % bufferSize;
-            if (sequence[index] == sequenceNumber)
+            if (sequence[index] == sequenceNumber && hasAllocations)
             {
                 return elements[index];
             }
@@ -40,7 +41,8 @@ namespace Lem.Networking.Implementation.Channels
             {
                 lastSequence = (ushort) (sequenceNumber + 1);
             }
-
+            
+            hasAllocations = true;
             var index = sequenceNumber % bufferSize;
             sequence[index] = sequenceNumber;
             elements[index].Reset();
@@ -62,10 +64,10 @@ namespace Lem.Networking.Implementation.Channels
 
         public (ushort, int) GenerateAck()
         {
-            var acksMask     = 0;
+            var acksMask = 0;
             for (ushort index = 0; index < sizeof(int) * 8; ++index)
             {
-                if (Element((ushort) (lastSequence - index)) != null)
+                if (Element((ushort) (lastSequence - index)) != default)
                 {
                     acksMask |= 1 << index;
                 }
