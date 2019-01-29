@@ -8,6 +8,7 @@ namespace Lem.Networking.Implementation.Channels
         private readonly int        bufferSize;
         private readonly ushort[]   sequence;
         private readonly TElement[] elements;
+        private          ushort     currentEpoch;
         private          ushort     lastSequence;
         private          bool       hasAllocations;
 
@@ -39,9 +40,14 @@ namespace Lem.Networking.Implementation.Channels
 
             if (lastSequence.IsSequenceLess((ushort) (sequenceNumber + 1)))
             {
-                lastSequence = (ushort) (sequenceNumber + 1);
+                var newSequence = (ushort) (sequenceNumber + 1);
+                if (newSequence < sequenceNumber)
+                {
+                    ++currentEpoch;
+                }
+                lastSequence = newSequence;
             }
-            
+
             hasAllocations = true;
             var index = sequenceNumber % bufferSize;
             sequence[index] = sequenceNumber;
@@ -49,6 +55,7 @@ namespace Lem.Networking.Implementation.Channels
             return elements[index];
         }
 
+        public ushort Epoch        => currentEpoch;
         public ushort LastSequence => lastSequence;
 
         public void Reset()

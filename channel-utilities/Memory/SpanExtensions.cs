@@ -59,5 +59,10 @@ namespace Lem.Networking.Utilities.Memory
         {
             return span.Slice(byteOffset)[0];
         }
+
+        public static ref ulong ULongRef(this Span<byte> span, int byteOffset = 0)
+        {
+            return ref MemoryMarshal.Cast<byte, ulong>(span.Slice(byteOffset))[0];
+        }
     }
 }

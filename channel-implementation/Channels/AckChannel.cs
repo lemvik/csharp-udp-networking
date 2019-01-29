@@ -22,7 +22,9 @@ namespace Lem.Networking.Implementation.Channels
         {
         }
 
-        public int MaxPayloadSize => Constants.MaximumPayloadSizeBytes - AckPacketHeader.ByteSize;
+        public ushort Epoch          => sentPackets.Epoch;
+        public ushort Sequence       => sentPackets.LastSequence;
+        public int    MaxPayloadSize => Constants.MaximumPayloadSizeBytes - AckPacketHeader.ByteSize;
 
         public int BufferRequiredByteSize(int desiredPacketByteSize)
         {

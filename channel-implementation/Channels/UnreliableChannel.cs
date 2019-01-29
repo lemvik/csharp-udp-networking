@@ -6,7 +6,7 @@ namespace Lem.Networking.Implementation.Channels
     internal class UnreliableChannel : IUnreliableChannel
     {
         private readonly ChannelAddress channelAddress;
-        private          ushort         sequence;
+        private          uint sequence;
 
         internal UnreliableChannel(ChannelAddress channelAddress)
         {
@@ -17,7 +17,10 @@ namespace Lem.Networking.Implementation.Channels
         {
         }
 
-        public int MaxPayloadSize => Constants.MaximumPayloadSizeBytes - BasePacketHeader.ByteSize;
+
+        public ushort Epoch => (ushort) (sequence >> (sizeof(ushort) * 8));
+        public ushort Sequence => (ushort) sequence;
+        public int    MaxPayloadSize  => Constants.MaximumPayloadSizeBytes - BasePacketHeader.ByteSize;
 
         public int BufferRequiredByteSize(int desiredPacketByteSize)
         {
@@ -33,7 +36,7 @@ namespace Lem.Networking.Implementation.Channels
 
             paddedSendPacket.Write(new BasePacketHeader {
                 ChannelAddress = channelAddress,
-                Sequence       = ++sequence,
+                Sequence       = (ushort) ++sequence,
                 PayloadLength  = (ushort) (paddedSendPacket.Length - BasePacketHeader.ByteSize)
             });
         }

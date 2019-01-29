@@ -5,6 +5,10 @@
         <ProjectReference Include="..\channel-utilities\channel-utilities.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Portable.BouncyCastle" Version="1.8.4" />
+    </ItemGroup>
+
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
         <RootNamespace>Lem.Networking.Implementation</RootNamespace>
