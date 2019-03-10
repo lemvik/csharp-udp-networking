@@ -1,9 +1,8 @@
 using System;
 using FluentAssertions;
 using Lem.Networking.Exceptions;
-using Lem.Networking.Implementation.Channels;
+using Lem.Networking.Implementation.Channels.Sync;
 using Lem.Networking.Implementation.Packets;
-using Lem.Networking.Utilities.Memory;
 using Xunit;
 using Xunit.Abstractions;
 

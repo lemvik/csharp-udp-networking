@@ -1,7 +1,7 @@
 using System;
 using JetBrains.Annotations;
 
-namespace Lem.Networking.Channels.Sync
+namespace Lem.Networking.Channels
 {
     /// <inheritdoc />
     ///  <summary>

@@ -13,7 +13,7 @@ namespace Lem.Networking.Utilities.Network
         {
             return IPAddress.NetworkToHostOrder(number);
         }
-        
+
         public static uint ToNetworkOrder(this uint number)
         {
             return (uint)IPAddress.HostToNetworkOrder((int)number);
@@ -23,7 +23,7 @@ namespace Lem.Networking.Utilities.Network
         {
             return (uint)IPAddress.NetworkToHostOrder((int)number);
         }
-        
+
         public static short ToNetworkOrder(this short number)
         {
             return IPAddress.HostToNetworkOrder(number);
@@ -33,7 +33,7 @@ namespace Lem.Networking.Utilities.Network
         {
             return IPAddress.NetworkToHostOrder(number);
         }
-        
+
         public static ushort ToNetworkOrder(this ushort number)
         {
             return (ushort)IPAddress.HostToNetworkOrder((short)number);
@@ -43,5 +43,6 @@ namespace Lem.Networking.Utilities.Network
         {
             return (ushort)IPAddress.NetworkToHostOrder((short)number);
         }
+
     }
 }

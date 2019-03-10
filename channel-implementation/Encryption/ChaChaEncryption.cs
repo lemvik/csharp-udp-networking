@@ -23,8 +23,8 @@ namespace Lem.Networking.Implementation.Encryption
 
         public bool Encrypt(in Span<byte> outgoingPacket, ulong channelInitVector)
         {
-            new Span<byte>(encryptionIvBuffer).ULongRef() = channelInitVector;
-            
+            new Span<byte>(encryptionIvBuffer).RefULong() = channelInitVector;
+
             // null in parameters means key re-use.
             encryptor.Init(true, new ParametersWithIV(null, encryptionIvBuffer));
             var encryptablePart = outgoingPacket.Slice(BasePacketHeader.UnencryptedByteSize);
@@ -39,8 +39,8 @@ namespace Lem.Networking.Implementation.Encryption
 
         public bool Decrypt(in Span<byte> incomingPacket, ulong channelInitVector)
         {
-            new Span<byte>(decryptionIvBuffer).ULongRef() = channelInitVector;
-            
+            new Span<byte>(decryptionIvBuffer).RefULong() = channelInitVector;
+
             // null in parameters means key re-use.
             decryptor.Init(false, new ParametersWithIV(null, decryptionIvBuffer));
             var decryptablePart = incomingPacket.Slice(BasePacketHeader.UnencryptedByteSize);

@@ -1,6 +1,6 @@
 using System;
 
-namespace Lem.Networking.Implementation.Channels
+namespace Lem.Networking.Implementation.Channels.Sync
 {
     internal interface IAckChannel : IChannel
     {

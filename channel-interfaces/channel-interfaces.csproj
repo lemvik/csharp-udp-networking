@@ -7,14 +7,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="JetBrains.Annotations" Version="2018.2.1">
-            <PrivateAssets>true</PrivateAssets>
-        </PackageReference>
+        <PackageReference Include="JetBrains.Annotations" Version="2018.2.1" PrivateAssets="true" ExcludeAssets="runtime" />
         <PackageReference Include="System.Memory" Version="4.5.2" />
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Channels\Async" />
+        <ProjectReference Include="..\channel-utilities\channel-utilities.csproj" />
     </ItemGroup>
 
 </Project>
